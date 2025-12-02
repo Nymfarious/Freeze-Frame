@@ -63,15 +63,15 @@ export function ProjectSetup({ onProjectCreated }: ProjectSetupProps) {
           <div className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="project-name" className="text-foreground text-base">
-                Project Name
+                Project Name <span className="text-destructive">*</span>
               </Label>
               <Input
                 id="project-name"
                 type="text"
-                placeholder="My Amazing Video Project"
+                placeholder="Required: Enter your project name"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
-                className="bg-gray-900/50 border-gray-700 text-foreground placeholder:text-muted-foreground h-12 text-base"
+                className="bg-gray-900/50 border-gray-700 text-foreground placeholder:text-destructive h-12 text-base"
               />
             </div>
 

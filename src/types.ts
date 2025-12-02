@@ -11,6 +11,8 @@ export interface Project {
   frames: Frame[];
   createdAt: number;
   lastModified: number;
+  frameNamingTemplate?: string; // NEW: Custom naming template for frames
+  categories?: string[]; // NEW: AI-suggested or user-defined categories
 }
 
 export type ScanRange = 
@@ -41,6 +43,10 @@ export interface Frame {
   createdAt: number;
   enhancementHistory?: EnhancementRecord[]; // Track all enhancements
   appliedEnhancements?: (keyof EnhancementStyles)[]; // List of all applied enhancement types
+  customName?: string; // NEW: Custom name from template
+  categories?: string[]; // NEW: User-assigned categories
+  parentFrameId?: string; // NEW: Track if this is a saved version of another frame
+  isSavedState?: boolean; // NEW: Mark frames that were explicitly saved
 }
 
 export interface FrameAnalysis {
@@ -54,12 +60,15 @@ export interface FrameAnalysis {
 }
 
 export interface EnhancementStyles {
-  unblur: boolean;
-  cinematicLighting: boolean;
-  portraitBokeh: boolean;
-  removeBackground: boolean;
-  colorPop: boolean;
-  hdr: boolean;
+  unblur?: boolean;
+  cinematicLighting?: boolean;
+  portraitBokeh?: boolean;
+  removeBackground?: boolean;
+  colorPop?: boolean;
+  hdr?: boolean;
+  enhanceDetail?: boolean;
+  upscale?: boolean;
+  denoise?: boolean;
 }
 
 export interface PipelineStatus {

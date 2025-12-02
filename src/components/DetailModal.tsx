@@ -280,6 +280,17 @@ export function DetailModal({
 
               {/* Actions */}
               <div className="space-y-3">
+                {frame.isEnhanced && frame.enhancementHistory && frame.enhancementHistory.length > 0 && (
+                  <Button
+                    onClick={() => onSaveAsNew(frame.id)}
+                    variant="outline"
+                    className="w-full border-border bg-background/50 hover:bg-background gap-2"
+                  >
+                    <Save className="w-4 h-4" />
+                    Save Current State
+                  </Button>
+                )}
+
                 <Button
                   onClick={handleEnhance}
                   disabled={
@@ -309,17 +320,6 @@ export function DetailModal({
                     Keep this frame
                   </label>
                 </div>
-
-                {frame.isEnhanced && (
-                  <Button
-                    onClick={() => onSaveAsNew(frame.id)}
-                    variant="outline"
-                    className="w-full border-gray-700 bg-gray-900/50 hover:bg-gray-900"
-                  >
-                    <Save className="w-4 h-4 mr-2" />
-                    Save as New Version
-                  </Button>
-                )}
 
                 <Button
                   onClick={onClose}

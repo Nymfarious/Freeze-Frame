@@ -9,8 +9,10 @@ import { QuickPreviewStrip } from './QuickPreviewStrip';
 import { AIAgentReadyPanel } from './AIAgentReadyPanel';
 import { PlaceholderFrameGrid } from './PlaceholderFrameGrid';
 import { FullLibrary } from './FullLibrary';
+import { BatchEnhanceDialog } from './BatchEnhanceDialog';
+import { CloudUploadDialog } from './CloudUploadDialog';
 import { Button } from '@/components/ui/button';
-import { Download, ArrowLeft } from 'lucide-react';
+import { Download, ArrowLeft, Sparkles, Cloud } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportLibrary } from '@/services/exportService';
 import { getAllProjects, getAllKeeperFrames } from '@/services/indexedDB';
@@ -33,6 +35,9 @@ interface MainWorkspaceProps {
   onToggleKeeper: (frameId: string, isKeeper: boolean) => void;
   onEnhance: (frameId: string, styles: EnhancementStyles) => Promise<void>;
   onSaveAsNew: (frameId: string) => void;
+  onCategoriesUpdate: (frameId: string, categories: string[]) => void;
+  onBatchEnhance: (frameIds: string[], styles: EnhancementStyles) => Promise<void>;
+  onCloudExport: (provider: 'drive' | 'dropbox' | 'local') => Promise<void>;
 }
 
 export function MainWorkspace({
@@ -51,6 +56,9 @@ export function MainWorkspace({
   onToggleKeeper,
   onEnhance,
   onSaveAsNew,
+  onCategoriesUpdate,
+  onBatchEnhance,
+  onCloudExport,
 }: MainWorkspaceProps) {
   const [showFilters, setShowFilters] = useState(false);
   const [viewKeepersOnly, setViewKeepersOnly] = useState(false);
@@ -60,6 +68,8 @@ export function MainWorkspace({
   const [showLibraryView, setShowLibraryView] = useState(false);
   const [allProjects, setAllProjects] = useState<Project[]>([]);
   const [allKeeperFrames, setAllKeeperFrames] = useState<Frame[]>([]);
+  const [showBatchEnhance, setShowBatchEnhance] = useState(false);
+  const [showCloudExport, setShowCloudExport] = useState(false);
 
   // Load library data
   useEffect(() => {
@@ -89,6 +99,7 @@ export function MainWorkspace({
         }}
         onFrameDelete={onFrameDelete}
         onToggleKeeper={onToggleKeeper}
+        onCategoriesUpdate={onCategoriesUpdate}
         onBack={() => setShowLibraryView(false)}
       />
     );
@@ -167,15 +178,37 @@ export function MainWorkspace({
             </div>
           </div>
 
-          {keeperCount > 0 && (
-            <Button
-              onClick={handleExport}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-900/30"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Download Library
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {keeperCount > 1 && (
+              <Button
+                onClick={() => setShowBatchEnhance(true)}
+                variant="outline"
+                className="border-border bg-background/50 hover:bg-background gap-2"
+              >
+                <Sparkles className="w-4 h-4" />
+                Batch Enhance
+              </Button>
+            )}
+            {keeperCount > 0 && (
+              <>
+                <Button
+                  onClick={() => setShowCloudExport(true)}
+                  variant="outline"
+                  className="border-border bg-background/50 hover:bg-background gap-2"
+                >
+                  <Cloud className="w-4 h-4" />
+                  Export
+                </Button>
+                <Button
+                  onClick={handleExport}
+                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg shadow-green-900/30"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Download ZIP
+                </Button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Pipeline Status */}
@@ -252,6 +285,21 @@ export function MainWorkspace({
           onEnhance={onEnhance}
           onToggleKeeper={onToggleKeeper}
           onSaveAsNew={onSaveAsNew}
+        />
+
+        {/* Batch Enhance Dialog */}
+        <BatchEnhanceDialog
+          open={showBatchEnhance}
+          onOpenChange={setShowBatchEnhance}
+          frames={frames}
+          onBatchEnhance={onBatchEnhance}
+        />
+
+        {/* Cloud Export Dialog */}
+        <CloudUploadDialog
+          open={showCloudExport}
+          onOpenChange={setShowCloudExport}
+          onUpload={onCloudExport}
         />
       </div>
     </div>

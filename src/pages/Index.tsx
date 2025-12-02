@@ -6,6 +6,7 @@ import { getVideoMetadata, extractFrames } from '@/services/videoProcessor';
 import { analyzeFrame, enhanceFrame } from '@/services/geminiAPI';
 import { saveProject, saveFrames, updateFrame, deleteFrame as dbDeleteFrame } from '@/services/indexedDB';
 import { toast } from 'sonner';
+import { exportLibrary } from '@/services/exportService';
 
 export default function Index() {
   const [project, setProject] = useState<Project | null>(null);
@@ -19,7 +20,7 @@ export default function Index() {
   });
   const [apiConfig] = useState<APIKeyConfig>({ mode: 'lovable' });
 
-  const handleProjectCreated = async (name: string, videoFile: File) => {
+  const handleProjectCreated = async (name: string, videoFile: File, frameNamingTemplate?: string) => {
     try {
       const metadata = await getVideoMetadata(videoFile);
       const videoUrl = URL.createObjectURL(videoFile);
@@ -35,6 +36,7 @@ export default function Index() {
         frames: [],
         createdAt: Date.now(),
         lastModified: Date.now(),
+        frameNamingTemplate,
       };
 
       setProject(newProject);
@@ -73,20 +75,31 @@ export default function Index() {
         }
       );
 
-      setFrames(extractedFrames);
-      await saveFrames(extractedFrames);
+      // Apply custom naming if template provided
+      const framesWithNames = extractedFrames.map((frame, index) => {
+        if (project.frameNamingTemplate) {
+          return {
+            ...frame,
+            customName: `${project.frameNamingTemplate}_${index + 1}`
+          };
+        }
+        return frame;
+      });
+
+      setFrames(framesWithNames);
+      await saveFrames(framesWithNames);
 
       setPipelineStatus({
         stage: 'analyzing',
         samplingProgress: 100,
         analyzingCurrent: 0,
-        analyzingTotal: extractedFrames.length,
-        extractedCount: extractedFrames.length,
+        analyzingTotal: framesWithNames.length,
+        extractedCount: framesWithNames.length,
       });
 
       // Analyze frames
-      for (let i = 0; i < extractedFrames.length; i++) {
-        const frame = extractedFrames[i];
+      for (let i = 0; i < framesWithNames.length; i++) {
+        const frame = framesWithNames[i];
         
         try {
           const analysis = await analyzeFrame(
@@ -96,8 +109,8 @@ export default function Index() {
           );
 
           const updatedFrame = { ...frame, analysis };
-          extractedFrames[i] = updatedFrame;
-          setFrames([...extractedFrames]);
+          framesWithNames[i] = updatedFrame;
+          setFrames([...framesWithNames]);
           await updateFrame(frame.id, { analysis });
 
           setPipelineStatus((prev) => ({
@@ -206,6 +219,12 @@ export default function Index() {
     }
   };
 
+  const handleBatchEnhance = async (frameIds: string[], styles: EnhancementStyles) => {
+    for (const frameId of frameIds) {
+      await handleEnhance(frameId, styles);
+    }
+  };
+
   const handleToggleKeeper = async (frameId: string, isKeeper: boolean) => {
     const updatedFrames = frames.map((f) =>
       f.id === frameId ? { ...f, isKeeper } : f
@@ -223,21 +242,54 @@ export default function Index() {
 
   const handleSaveAsNew = async (frameId: string) => {
     const frame = frames.find((f) => f.id === frameId);
-    if (!frame || !frame.enhancedImageData) return;
+    if (!frame) return;
 
-    const newFrame: Frame = {
-      ...frame,
-      id: `${frame.id}-enhanced-${Date.now()}`,
-      imageData: frame.enhancedImageData,
-      enhancedImageData: undefined,
-      isEnhanced: false,
-      createdAt: Date.now(),
-    };
+    // If the frame has been enhanced, flatten the enhancement history
+    if (frame.isEnhanced && frame.enhancedImageData) {
+      const savedFrame: Frame = {
+        ...frame,
+        id: `${frame.id}-saved-${Date.now()}`,
+        imageData: frame.enhancedImageData, // Flattened: enhanced becomes new original
+        enhancedImageData: undefined,
+        isEnhanced: false,
+        enhancementHistory: [], // Clear history
+        // Keep appliedEnhancements to remember what was done
+        parentFrameId: frame.id,
+        isSavedState: true,
+        createdAt: Date.now(),
+      };
 
-    const updatedFrames = [...frames, newFrame];
+      const updatedFrames = [...frames, savedFrame];
+      setFrames(updatedFrames);
+      await saveFrames([savedFrame]);
+      toast.success('Saved current state as new frame');
+    }
+  };
+
+  const handleCategoriesUpdate = async (frameId: string, categories: string[]) => {
+    const updatedFrames = frames.map((f) =>
+      f.id === frameId ? { ...f, categories } : f
+    );
     setFrames(updatedFrames);
-    await saveFrames([newFrame]);
-    toast.success('Saved as new version');
+    await updateFrame(frameId, { categories });
+  };
+
+  const handleCloudExport = async (provider: 'drive' | 'dropbox' | 'local') => {
+    const keeperFrames = frames.filter((f) => f.isKeeper);
+    
+    if (keeperFrames.length === 0) {
+      toast.error('No keeper frames to export');
+      return;
+    }
+
+    if (provider === 'local') {
+      // Local export (existing ZIP download)
+      await exportLibrary(project!.name, frames);
+      toast.success('Exported locally');
+    } else {
+      // Cloud export - would integrate with actual cloud APIs
+      toast.info(`${provider} integration coming soon!`);
+    }
   };
 
   const handleNewScan = () => {
@@ -275,6 +327,9 @@ export default function Index() {
       onToggleKeeper={handleToggleKeeper}
       onEnhance={handleEnhance}
       onSaveAsNew={handleSaveAsNew}
+      onCategoriesUpdate={handleCategoriesUpdate}
+      onBatchEnhance={handleBatchEnhance}
+      onCloudExport={handleCloudExport}
     />
   );
 }

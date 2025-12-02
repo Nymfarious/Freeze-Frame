@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Frame, Project } from '@/types';
 import { FrameCard } from './FrameCard';
+import { CategoryManager } from './CategoryManager';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { formatTimestamp } from '@/services/videoProcessor';
 import { ArrowLeft } from 'lucide-react';
@@ -12,6 +13,7 @@ interface FullLibraryProps {
   onFrameSelect: (frame: Frame) => void;
   onFrameDelete: (frameId: string) => void;
   onToggleKeeper: (frameId: string, isKeeper: boolean) => void;
+  onCategoriesUpdate: (frameId: string, categories: string[]) => void;
   onBack: () => void;
 }
 
@@ -21,6 +23,7 @@ export function FullLibrary({
   onFrameSelect,
   onFrameDelete,
   onToggleKeeper,
+  onCategoriesUpdate,
   onBack,
 }: FullLibraryProps) {
   const [activeTab, setActiveTab] = useState('all');
@@ -53,21 +56,27 @@ export function FullLibrary({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Button
-              onClick={onBack}
-              variant="ghost"
-              size="icon"
-              className="hover:bg-accent"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Full Library</h1>
-              <p className="text-muted-foreground mt-1">
-                {allKeeperFrames.length} keeper frames across {Object.keys(framesByProject).length} projects
-              </p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={onBack}
+                variant="ghost"
+                size="icon"
+                className="hover:bg-accent"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">Full Library</h1>
+                <p className="text-muted-foreground mt-1">
+                  {allKeeperFrames.length} keeper frames across {Object.keys(framesByProject).length} projects
+                </p>
+              </div>
             </div>
+            <CategoryManager
+              frames={allKeeperFrames}
+              onCategoriesUpdate={onCategoriesUpdate}
+            />
           </div>
         </div>
 

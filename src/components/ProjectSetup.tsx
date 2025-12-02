@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 interface ProjectSetupProps {
-  onProjectCreated: (name: string, videoFile: File) => void;
+  onProjectCreated: (name: string, videoFile: File, frameNamingTemplate?: string) => void;
 }
 
 export function ProjectSetup({ onProjectCreated }: ProjectSetupProps) {
   const [projectName, setProjectName] = useState('');
+  const [frameNamingTemplate, setFrameNamingTemplate] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +44,7 @@ export function ProjectSetup({ onProjectCreated }: ProjectSetupProps) {
 
   const handleSubmit = () => {
     if (projectName.trim() && selectedFile) {
-      onProjectCreated(projectName.trim(), selectedFile);
+      onProjectCreated(projectName.trim(), selectedFile, frameNamingTemplate.trim() || undefined);
     }
   };
 
@@ -73,6 +74,23 @@ export function ProjectSetup({ onProjectCreated }: ProjectSetupProps) {
                 onChange={(e) => setProjectName(e.target.value)}
                 className="bg-background/50 border-border text-foreground placeholder:text-destructive/80 h-12 text-base"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="frame-naming" className="text-foreground text-base font-semibold">
+                Frame Naming Template (Optional)
+              </Label>
+              <Input
+                id="frame-naming"
+                type="text"
+                placeholder="e.g., MyProject_Frame or Event2024_"
+                value={frameNamingTemplate}
+                onChange={(e) => setFrameNamingTemplate(e.target.value)}
+                className="bg-background/50 border-border text-foreground h-12 text-base"
+              />
+              <p className="text-sm text-muted-foreground">
+                Custom prefix for extracted frame names. Leave empty for default naming.
+              </p>
             </div>
 
             <div className="space-y-2">

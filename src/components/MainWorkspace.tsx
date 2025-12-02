@@ -132,7 +132,15 @@ export function MainWorkspace({
         </div>
 
         {/* Pipeline Status */}
-        {isScanning && <PipelineVisualizer status={pipelineStatus} />}
+        {isScanning && (
+          <div className="space-y-6">
+            <AIAgentReadyPanel 
+              estimatedFrames={estimatedFrames}
+              pipelineStatus={pipelineStatus}
+            />
+            <PipelineVisualizer status={pipelineStatus} />
+          </div>
+        )}
 
         {/* Pre-Scan Hero */}
         {frames.length === 0 && !isScanning && (

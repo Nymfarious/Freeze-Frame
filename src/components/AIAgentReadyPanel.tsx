@@ -1,37 +1,86 @@
 import { Bot, Sparkles, User, Zap } from 'lucide-react';
+import { PipelineStatus } from '@/types';
 
 interface AIAgentReadyPanelProps {
   estimatedFrames: number;
+  pipelineStatus?: PipelineStatus;
 }
 
-export function AIAgentReadyPanel({ estimatedFrames }: AIAgentReadyPanelProps) {
+export function AIAgentReadyPanel({ estimatedFrames, pipelineStatus }: AIAgentReadyPanelProps) {
+  const getAgentState = (agentName: string): 'dormant' | 'waking' | 'active' => {
+    if (!pipelineStatus || pipelineStatus.stage === 'idle') {
+      return agentName === 'Sampler' ? 'active' : agentName === 'Analyzer' ? 'waking' : 'dormant';
+    }
+
+    if (pipelineStatus.stage === 'sampling') {
+      return agentName === 'Sampler' ? 'active' : agentName === 'Analyzer' ? 'waking' : 'dormant';
+    }
+
+    if (pipelineStatus.stage === 'analyzing') {
+      return agentName === 'Sampler' ? 'active' : agentName === 'Analyzer' ? 'active' : 'waking';
+    }
+
+    if (pipelineStatus.stage === 'clustering' || pipelineStatus.stage === 'complete') {
+      return 'active';
+    }
+
+    return 'dormant';
+  };
+
+  const getAgentStatus = (agentName: string): string => {
+    if (!pipelineStatus || pipelineStatus.stage === 'idle') {
+      return agentName === 'Sampler' ? `~${estimatedFrames} frames` : agentName === 'Analyzer' ? 'Awaiting data' : 'On standby';
+    }
+
+    if (pipelineStatus.stage === 'sampling') {
+      return agentName === 'Sampler' ? `Extracting... ${Math.round(pipelineStatus.samplingProgress)}%` : agentName === 'Analyzer' ? 'Awaiting data' : 'On standby';
+    }
+
+    if (pipelineStatus.stage === 'analyzing') {
+      const analyzingProgress = pipelineStatus.analyzingTotal > 0 
+        ? Math.round((pipelineStatus.analyzingCurrent / pipelineStatus.analyzingTotal) * 100)
+        : 0;
+      return agentName === 'Sampler' ? 'Complete' : agentName === 'Analyzer' ? `Analyzing... ${analyzingProgress}%` : 'Awaiting data';
+    }
+
+    if (pipelineStatus.stage === 'clustering') {
+      return agentName === 'Sampler' ? 'Complete' : agentName === 'Analyzer' ? 'Complete' : 'Grouping...';
+    }
+
+    if (pipelineStatus.stage === 'complete') {
+      return 'Complete';
+    }
+
+    return 'On standby';
+  };
+
   const agents = [
     {
       name: 'Sampler',
       role: 'Frame Extraction',
-      status: `~${estimatedFrames} frames`,
+      status: getAgentStatus('Sampler'),
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-500/10',
       pulseColor: 'bg-blue-500',
-      state: 'active' as const,
+      state: getAgentState('Sampler'),
     },
     {
       name: 'Analyzer',
       role: 'Vision AI',
-      status: 'Awaiting data',
+      status: getAgentStatus('Analyzer'),
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-500/10',
       pulseColor: 'bg-purple-500',
-      state: 'waking' as const,
+      state: getAgentState('Analyzer'),
     },
     {
       name: 'Cluster',
       role: 'Grouping',
-      status: 'On standby',
+      status: getAgentStatus('Cluster'),
       color: 'from-emerald-500 to-teal-500',
       bgColor: 'bg-emerald-500/10',
       pulseColor: 'bg-emerald-500',
-      state: 'dormant' as const,
+      state: getAgentState('Cluster'),
     },
   ];
 

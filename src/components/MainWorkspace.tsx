@@ -5,6 +5,7 @@ import { PipelineVisualizer } from './PipelineVisualizer';
 import { FrameGallery } from './FrameGallery';
 import { DetailModal } from './DetailModal';
 import { VideoPreviewHero } from './VideoPreviewHero';
+import { QuickPreviewStrip } from './QuickPreviewStrip';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
@@ -132,11 +133,17 @@ export function MainWorkspace({
 
         {/* Pre-Scan Hero */}
         {frames.length === 0 && !isScanning && (
-          <VideoPreviewHero 
-            videoFile={videoFile}
-            videoDuration={videoDuration}
-            scanInterval={scanInterval}
-          />
+          <div className="space-y-6">
+            <VideoPreviewHero 
+              videoFile={videoFile}
+              videoDuration={videoDuration}
+              scanInterval={scanInterval}
+            />
+            <QuickPreviewStrip 
+              videoFile={videoFile}
+              videoDuration={videoDuration}
+            />
+          </div>
         )}
 
         {/* Gallery */}

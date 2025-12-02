@@ -6,6 +6,7 @@ import { FrameGallery } from './FrameGallery';
 import { DetailModal } from './DetailModal';
 import { VideoPreviewHero } from './VideoPreviewHero';
 import { QuickPreviewStrip } from './QuickPreviewStrip';
+import { AIAgentReadyPanel } from './AIAgentReadyPanel';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
@@ -88,6 +89,7 @@ export function MainWorkspace({
   };
 
   const keeperCount = frames.filter((f) => f.isKeeper).length;
+  const estimatedFrames = Math.floor(videoDuration / scanInterval);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950">
@@ -142,6 +144,9 @@ export function MainWorkspace({
             <QuickPreviewStrip 
               videoFile={videoFile}
               videoDuration={videoDuration}
+            />
+            <AIAgentReadyPanel 
+              estimatedFrames={estimatedFrames}
             />
           </div>
         )}

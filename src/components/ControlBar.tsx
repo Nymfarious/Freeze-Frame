@@ -26,6 +26,7 @@ interface ControlBarProps {
   onToggleFilters: () => void;
   onToggleKeepersView: () => void;
   onToggleGalleryView?: () => void;
+  onToggleLibrary?: () => void;
 }
 
 export function ControlBar({
@@ -44,6 +45,7 @@ export function ControlBar({
   onToggleFilters,
   onToggleKeepersView,
   onToggleGalleryView,
+  onToggleLibrary,
 }: ControlBarProps) {
   return (
     <div className="bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
@@ -147,6 +149,18 @@ export function ControlBar({
                         View Extracted Frames
                       </>
                     )}
+                  </Button>
+                )}
+
+                {onToggleLibrary && (
+                  <Button
+                    onClick={onToggleLibrary}
+                    variant="outline"
+                    className="border-border bg-background/50 hover:bg-background"
+                    disabled={isScanning}
+                  >
+                    <Library className="w-4 h-4 mr-2" />
+                    View Library
                   </Button>
                 )}
               </div>

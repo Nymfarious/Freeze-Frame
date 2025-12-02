@@ -92,6 +92,18 @@ export async function getFramesByProject(projectId: string): Promise<Frame[]> {
   return db.getAllFromIndex('frames', 'by-project', projectId);
 }
 
+export async function getAllKeeperFrames(): Promise<Frame[]> {
+  const db = await getDB();
+  const allFrames = await db.getAll('frames');
+  return allFrames.filter(frame => frame.isKeeper);
+}
+
+export async function getKeeperFramesByProject(projectId: string): Promise<Frame[]> {
+  const db = await getDB();
+  const projectFrames = await db.getAllFromIndex('frames', 'by-project', projectId);
+  return projectFrames.filter(frame => frame.isKeeper);
+}
+
 export async function deleteFrame(id: string): Promise<void> {
   const db = await getDB();
   await db.delete('frames', id);

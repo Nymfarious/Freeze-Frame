@@ -20,6 +20,14 @@ export type ScanRange =
   | "first-quarter"
   | "last-quarter";
 
+export interface EnhancementRecord {
+  id: string;
+  timestamp: number;
+  styles: EnhancementStyles;
+  inputImageData: string;  // What image was enhanced (original or previous enhancement)
+  outputImageData: string; // The result
+}
+
 export interface Frame {
   id: string;
   projectId: string;
@@ -31,6 +39,8 @@ export interface Frame {
   isEnhanced: boolean;
   isProcessing: boolean;
   createdAt: number;
+  enhancementHistory?: EnhancementRecord[]; // Track all enhancements
+  appliedEnhancements?: (keyof EnhancementStyles)[]; // List of all applied enhancement types
 }
 
 export interface FrameAnalysis {

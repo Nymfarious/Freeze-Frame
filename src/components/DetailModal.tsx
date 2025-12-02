@@ -104,25 +104,36 @@ export function DetailModal({
 
             <div className="flex-1 relative flex items-center justify-center p-8">
               {frame.isEnhanced && frame.enhancedImageData ? (
-                <div className="flex gap-4 max-h-full">
-                  <div className="flex-1 flex flex-col">
-                    <span className="text-sm text-muted-foreground mb-2 text-center">
-                      Original
-                    </span>
+                <div className="flex gap-6 max-h-full items-start">
+                  {/* Original - Mini Pic (30% width) */}
+                  <div className="w-[30%] flex flex-col">
+                    <div className="mb-3">
+                      <span className="text-sm font-semibold text-foreground">Original</span>
+                    </div>
                     <img
                       src={frame.imageData}
                       alt="Original"
-                      className="max-h-full w-auto object-contain rounded-lg border border-gray-800"
+                      className="max-h-full w-full object-contain rounded-lg border border-border"
                     />
                   </div>
+                  
+                  {/* Enhanced - Larger (70% width) */}
                   <div className="flex-1 flex flex-col">
-                    <span className="text-sm text-muted-foreground mb-2 text-center">
-                      Enhanced
-                    </span>
+                    <div className="mb-3">
+                      <span className="text-sm font-semibold text-foreground">Enhanced</span>
+                      {frame.appliedEnhancements && frame.appliedEnhancements.length > 0 && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {frame.appliedEnhancements.map((key) => {
+                            const option = styleOptions.find((opt) => opt.key === key);
+                            return option?.label;
+                          }).filter(Boolean).join(' + ')}
+                        </div>
+                      )}
+                    </div>
                     <img
                       src={frame.enhancedImageData}
                       alt="Enhanced"
-                      className="max-h-full w-auto object-contain rounded-lg border border-gray-800"
+                      className="max-h-full w-full object-contain rounded-lg border border-border"
                     />
                   </div>
                 </div>
@@ -130,7 +141,7 @@ export function DetailModal({
                 <img
                   src={frame.imageData}
                   alt="Frame"
-                  className="max-h-full max-w-full object-contain rounded-lg border border-gray-800"
+                  className="max-h-full max-w-full object-contain rounded-lg border border-border"
                 />
               )}
 

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Frame, PipelineStatus, ScanRange, EnhancementStyles, APIKeyConfig } from '@/types';
+import { useState, useEffect } from 'react';
+import { Frame, PipelineStatus, ScanRange, EnhancementStyles, APIKeyConfig, Project } from '@/types';
 import { ControlBar } from './ControlBar';
 import { PipelineVisualizer } from './PipelineVisualizer';
 import { FrameGallery } from './FrameGallery';
@@ -8,10 +8,12 @@ import { VideoPreviewHero } from './VideoPreviewHero';
 import { QuickPreviewStrip } from './QuickPreviewStrip';
 import { AIAgentReadyPanel } from './AIAgentReadyPanel';
 import { PlaceholderFrameGrid } from './PlaceholderFrameGrid';
+import { FullLibrary } from './FullLibrary';
 import { Button } from '@/components/ui/button';
 import { Download, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { exportLibrary } from '@/services/exportService';
+import { getAllProjects, getAllKeeperFrames } from '@/services/indexedDB';
 
 interface MainWorkspaceProps {
   projectName: string;
@@ -55,11 +57,42 @@ export function MainWorkspace({
   const [activeTab, setActiveTab] = useState<'all' | 'originals' | 'enhanced'>('all');
   const [selectedFrame, setSelectedFrame] = useState<Frame | null>(null);
   const [showGalleryView, setShowGalleryView] = useState(true);
+  const [showLibraryView, setShowLibraryView] = useState(false);
+  const [allProjects, setAllProjects] = useState<Project[]>([]);
+  const [allKeeperFrames, setAllKeeperFrames] = useState<Frame[]>([]);
+
+  // Load library data
+  useEffect(() => {
+    const loadLibrary = async () => {
+      const projects = await getAllProjects();
+      const keepers = await getAllKeeperFrames();
+      setAllProjects(projects);
+      setAllKeeperFrames(keepers);
+    };
+    loadLibrary();
+  }, [frames]); // Reload when frames change
 
   const isScanned = frames.length > 0 && pipelineStatus.stage === 'complete';
   const isScanning = pipelineStatus.stage !== 'idle' && pipelineStatus.stage !== 'complete';
 
   const displayFrames = viewKeepersOnly ? frames.filter((f) => f.isKeeper) : frames;
+
+  // If showing library, render library view
+  if (showLibraryView) {
+    return (
+      <FullLibrary
+        allProjects={allProjects}
+        allKeeperFrames={allKeeperFrames}
+        onFrameSelect={(frame) => {
+          setSelectedFrame(frame);
+          setShowLibraryView(false);
+        }}
+        onFrameDelete={onFrameDelete}
+        onToggleKeeper={onToggleKeeper}
+        onBack={() => setShowLibraryView(false)}
+      />
+    );
+  }
 
   const handleExport = async () => {
     const keeperFrames = frames.filter((f) => f.isKeeper);
@@ -111,6 +144,7 @@ export function MainWorkspace({
         onToggleFilters={() => setShowFilters(!showFilters)}
         onToggleKeepersView={() => setViewKeepersOnly(!viewKeepersOnly)}
         onToggleGalleryView={() => setShowGalleryView(!showGalleryView)}
+        onToggleLibrary={() => setShowLibraryView(true)}
       />
 
       <div className="container mx-auto px-6 py-8 space-y-8">

@@ -149,24 +149,51 @@ export default function Index() {
     await updateFrame(frameId, { isProcessing: true });
 
     try {
+      // Use the latest enhanced image as input if it exists, otherwise use original
+      const inputImage = frame.enhancedImageData || frame.imageData;
+      
       const enhancedImage = await enhanceFrame(
-        frame.imageData,
+        inputImage,
         styles,
         apiConfig.mode,
         apiConfig.customKey
       );
+
+      // Create enhancement record
+      const enhancementRecord = {
+        id: `enhancement-${Date.now()}`,
+        timestamp: Date.now(),
+        styles,
+        inputImageData: inputImage,
+        outputImageData: enhancedImage,
+      };
+
+      // Update applied enhancements list
+      const currentApplied = frame.appliedEnhancements || [];
+      const newApplied = Object.keys(styles).filter(
+        key => styles[key as keyof EnhancementStyles]
+      ) as (keyof EnhancementStyles)[];
+      const updatedApplied = [...new Set([...currentApplied, ...newApplied])];
+
+      // Update enhancement history
+      const history = frame.enhancementHistory || [];
+      const updatedHistory = [...history, enhancementRecord];
 
       updatedFrames[frameIndex] = {
         ...frame,
         enhancedImageData: enhancedImage,
         isEnhanced: true,
         isProcessing: false,
+        enhancementHistory: updatedHistory,
+        appliedEnhancements: updatedApplied,
       };
       setFrames(updatedFrames);
       await updateFrame(frameId, {
         enhancedImageData: enhancedImage,
         isEnhanced: true,
         isProcessing: false,
+        enhancementHistory: updatedHistory,
+        appliedEnhancements: updatedApplied,
       });
 
       toast.success('Enhancement completed');

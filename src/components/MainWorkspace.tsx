@@ -4,6 +4,7 @@ import { ControlBar } from './ControlBar';
 import { PipelineVisualizer } from './PipelineVisualizer';
 import { FrameGallery } from './FrameGallery';
 import { DetailModal } from './DetailModal';
+import { VideoPreviewHero } from './VideoPreviewHero';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
@@ -12,6 +13,7 @@ import { exportLibrary } from '@/services/exportService';
 interface MainWorkspaceProps {
   projectName: string;
   videoDuration: number;
+  videoFile: File;
   frames: Frame[];
   pipelineStatus: PipelineStatus;
   scanRange: ScanRange;
@@ -31,6 +33,7 @@ interface MainWorkspaceProps {
 export function MainWorkspace({
   projectName,
   videoDuration,
+  videoFile,
   frames,
   pipelineStatus,
   scanRange,
@@ -126,6 +129,15 @@ export function MainWorkspace({
 
         {/* Pipeline Status */}
         {isScanning && <PipelineVisualizer status={pipelineStatus} />}
+
+        {/* Pre-Scan Hero */}
+        {frames.length === 0 && !isScanning && (
+          <VideoPreviewHero 
+            videoFile={videoFile}
+            videoDuration={videoDuration}
+            scanInterval={scanInterval}
+          />
+        )}
 
         {/* Gallery */}
         {frames.length > 0 && (

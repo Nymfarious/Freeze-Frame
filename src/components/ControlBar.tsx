@@ -42,7 +42,7 @@ export function ControlBar({
   onToggleKeepersView,
 }: ControlBarProps) {
   return (
-    <div className="bg-gray-800/80 backdrop-blur-md border-b border-gray-700 shadow-lg">
+    <div className="bg-card/80 backdrop-blur-md border-b border-border shadow-lg">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           {!isScanned && !isScanning ? (
@@ -51,7 +51,7 @@ export function ControlBar({
                 <div className="space-y-1">
                   <label className="text-xs text-muted-foreground">Scan Range</label>
                   <Select value={scanRange} onValueChange={onScanRangeChange}>
-                    <SelectTrigger className="w-40 bg-gray-900/50 border-gray-700">
+                    <SelectTrigger className="w-40 bg-background/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -70,7 +70,7 @@ export function ControlBar({
                     value={scanInterval.toString()}
                     onValueChange={(v) => onScanIntervalChange(Number(v))}
                   >
-                    <SelectTrigger className="w-32 bg-gray-900/50 border-gray-700">
+                    <SelectTrigger className="w-32 bg-background/50 border-border">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -92,7 +92,7 @@ export function ControlBar({
 
               <Button
                 onClick={onStartScan}
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-6 h-10 shadow-lg shadow-purple-500/20"
+                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground px-6 h-10 shadow-lg shadow-primary/20"
               >
                 <Sparkles className="w-4 h-4 mr-2" />
                 Start Intelligent Scan
@@ -104,7 +104,7 @@ export function ControlBar({
                 <Button
                   onClick={onNewScan}
                   variant="outline"
-                  className="border-gray-700 bg-gray-900/50 hover:bg-gray-900"
+                  className="border-border bg-background/50 hover:bg-background"
                   disabled={isScanning}
                 >
                   <RotateCcw className="w-4 h-4 mr-2" />
@@ -114,8 +114,8 @@ export function ControlBar({
                 <Button
                   onClick={onToggleFilters}
                   variant="outline"
-                  className={`border-gray-700 ${
-                    showFilters ? 'bg-primary/20 border-primary' : 'bg-gray-900/50 hover:bg-gray-900'
+                  className={`${
+                    showFilters ? 'bg-primary/20 border-primary' : 'border-border bg-background/50 hover:bg-background'
                   }`}
                   disabled={isScanning}
                 >
@@ -126,8 +126,8 @@ export function ControlBar({
                 <Button
                   onClick={onToggleKeepersView}
                   variant="outline"
-                  className={`border-gray-700 ${
-                    viewKeepersOnly ? 'bg-primary/20 border-primary' : 'bg-gray-900/50 hover:bg-gray-900'
+                  className={`${
+                    viewKeepersOnly ? 'bg-primary/20 border-primary' : 'border-border bg-background/50 hover:bg-background'
                   }`}
                   disabled={isScanning}
                 >

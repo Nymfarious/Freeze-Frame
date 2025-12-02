@@ -47,18 +47,18 @@ export function PipelineVisualizer({ status }: PipelineVisualizerProps) {
   if (status.stage === 'idle') return null;
 
   return (
-    <div className="bg-gray-800/50 backdrop-blur-md border border-gray-700 rounded-2xl p-6 shadow-lg shadow-blue-900/10">
+    <div className="bg-card/50 backdrop-blur-md border border-border rounded-2xl p-6 shadow-lg shadow-primary/10">
       <h3 className="text-lg font-semibold text-foreground mb-4">AI Pipeline Status</h3>
       <div className="space-y-4">
         {stages.map((stage) => (
           <div key={stage.id} className="flex items-start gap-3">
             <div className="mt-1">
               {stage.complete ? (
-                <CheckCircle2 className="w-5 h-5 text-green-400" />
+                <CheckCircle2 className="w-5 h-5 text-accent" />
               ) : stage.active ? (
                 <Loader2 className="w-5 h-5 text-primary animate-spin" />
               ) : (
-                <div className="w-5 h-5 rounded-full border-2 border-gray-600" />
+                <div className="w-5 h-5 rounded-full border-2 border-muted" />
               )}
             </div>
             <div className="flex-1">
@@ -75,9 +75,9 @@ export function PipelineVisualizer({ status }: PipelineVisualizerProps) {
                 )}
               </div>
               {stage.active && stage.progress > 0 && (
-                <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300"
+                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300"
                     style={{ width: `${stage.progress}%` }}
                   />
                 </div>

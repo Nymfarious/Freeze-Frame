@@ -7,6 +7,7 @@ import { DetailModal } from './DetailModal';
 import { VideoPreviewHero } from './VideoPreviewHero';
 import { QuickPreviewStrip } from './QuickPreviewStrip';
 import { AIAgentReadyPanel } from './AIAgentReadyPanel';
+import { PlaceholderFrameGrid } from './PlaceholderFrameGrid';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { toast } from 'sonner';
@@ -135,7 +136,7 @@ export function MainWorkspace({
 
         {/* Pre-Scan Hero */}
         {frames.length === 0 && !isScanning && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <VideoPreviewHero 
               videoFile={videoFile}
               videoDuration={videoDuration}
@@ -146,6 +147,9 @@ export function MainWorkspace({
               videoDuration={videoDuration}
             />
             <AIAgentReadyPanel 
+              estimatedFrames={estimatedFrames}
+            />
+            <PlaceholderFrameGrid 
               estimatedFrames={estimatedFrames}
             />
           </div>

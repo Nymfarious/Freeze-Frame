@@ -70,12 +70,10 @@ export async function extractFrame(
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       
       const imageData = canvas.toDataURL('image/jpeg', 0.85);
-      URL.revokeObjectURL(videoUrl);
       resolve(imageData);
     };
     
     video.onerror = () => {
-      URL.revokeObjectURL(videoUrl);
       reject(new Error('Failed to load video'));
     };
     

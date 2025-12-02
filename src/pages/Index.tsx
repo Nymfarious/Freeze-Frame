@@ -233,6 +233,7 @@ export default function Index() {
     <MainWorkspace
       projectName={project.name}
       videoDuration={project.videoDuration}
+      videoFile={project.videoFile!}
       frames={frames}
       pipelineStatus={pipelineStatus}
       scanRange={project.scanRange}

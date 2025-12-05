@@ -83,10 +83,10 @@ export function FrameCard({ frame, onSelect, onDelete, onToggleKeeper }: FrameCa
         </div>
 
         {/* Center hover button */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           <Button
             variant="secondary"
-            className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20"
+            className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white border border-white/20 pointer-events-auto"
             onClick={(e) => {
               e.stopPropagation();
               onSelect();

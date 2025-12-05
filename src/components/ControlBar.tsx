@@ -96,13 +96,26 @@ export function ControlBar({
                 </div>
               </div>
 
-              <Button
-                onClick={onStartScan}
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground px-6 h-10 shadow-lg shadow-primary/20"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Start Intelligent Scan
-              </Button>
+              <div className="flex items-center gap-3">
+                {onToggleLibrary && (
+                  <Button
+                    onClick={onToggleLibrary}
+                    variant="outline"
+                    className="border-border bg-background/50 hover:bg-background"
+                  >
+                    <Library className="w-4 h-4 mr-2" />
+                    My Library
+                  </Button>
+                )}
+
+                <Button
+                  onClick={onStartScan}
+                  className="bg-gradient-to-r from-primary to-accent hover:opacity-90 text-primary-foreground px-6 h-10 shadow-lg shadow-primary/20"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Start Intelligent Scan
+                </Button>
+              </div>
             </>
           ) : (
             <>

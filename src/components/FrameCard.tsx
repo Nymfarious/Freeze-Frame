@@ -1,6 +1,17 @@
+import { useState } from 'react';
 import { Frame } from '@/types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Loader2, Sparkles, Trash2, User } from 'lucide-react';
 import { formatTimestamp } from '@/services/videoProcessor';
 
@@ -12,6 +23,7 @@ interface FrameCardProps {
 }
 
 export function FrameCard({ frame, onSelect, onDelete, onToggleKeeper }: FrameCardProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const displayImage = frame.enhancedImageData || frame.imageData;
   const quality = frame.analysis?.quality;
   const qualityColors = {
@@ -20,8 +32,40 @@ export function FrameCard({ frame, onSelect, onDelete, onToggleKeeper }: FrameCa
     fair: 'bg-yellow-500',
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowDeleteConfirm(false);
+    onDelete();
+  };
+
   return (
-    <div
+    <>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Frame?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this frame at {formatTimestamp(frame.timestamp)}.
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <div
       className="group relative bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all hover:shadow-xl hover:shadow-purple-500/10 cursor-pointer"
       onClick={onSelect}
     >
@@ -73,10 +117,7 @@ export function FrameCard({ frame, onSelect, onDelete, onToggleKeeper }: FrameCa
             size="icon"
             variant="ghost"
             className="h-6 w-6 bg-gray-900/80 backdrop-blur-sm hover:bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete();
-            }}
+            onClick={handleDeleteClick}
           >
             <Trash2 className="w-3 h-3" />
           </Button>
@@ -126,6 +167,7 @@ export function FrameCard({ frame, onSelect, onDelete, onToggleKeeper }: FrameCa
           />
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
